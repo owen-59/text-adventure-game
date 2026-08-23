@@ -5,5 +5,9 @@ mod room;
 mod room_location;
 
 fn main() {
-    let mut _dungeon = Dungeon::new();
+    let mut dungeon = Dungeon::new();
+
+    loop {
+        dungeon.run_input();
+    }
 }
