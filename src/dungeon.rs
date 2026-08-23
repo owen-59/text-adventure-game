@@ -116,33 +116,37 @@ impl Dungeon {
     }
 
     pub fn run_input(&mut self) {
+        let location = self.player.location.clone();
+        let room = self.get_room(&location);
+
         let inputs = [
             InputChoice {
                 name: "go north".to_string(),
                 key: 'n',
                 message: InputMessage::North,
+                show: room.door_config.north,
             },
             InputChoice {
                 name: "go east".to_string(),
                 key: 'e',
                 message: InputMessage::East,
+                show: room.door_config.east,
             },
             InputChoice {
                 name: "go south".to_string(),
                 key: 's',
                 message: InputMessage::South,
+                show: room.door_config.south,
             },
             InputChoice {
                 name: "go west".to_string(),
                 key: 'w',
                 message: InputMessage::West,
+                show: room.door_config.west,
             },
         ];
 
         let input = get_input(&inputs);
-
-        let location = self.player.location.clone();
-        let room = self.get_room(&location);
 
         match input.message {
             InputMessage::North => {

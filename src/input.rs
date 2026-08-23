@@ -11,11 +11,14 @@ pub struct InputChoice {
     pub name: String,
     pub key: char,
     pub message: InputMessage,
+    pub show: bool,
 }
 
 pub fn get_input(inputs: &[InputChoice]) -> &InputChoice {
     for input in inputs {
-        println!("{}: {}", input.key, input.name);
+        if input.show {
+            println!("{}: {}", input.key, input.name);
+        }
     }
     let mut u_input;
     loop {
