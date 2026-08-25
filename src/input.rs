@@ -5,6 +5,7 @@ pub enum InputMessage {
     South,
     East,
     West,
+    Punch,
 }
 
 pub struct InputChoice {

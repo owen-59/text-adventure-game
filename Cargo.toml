@@ -5,4 +5,5 @@ edition = "2024"
 
 [dependencies]
 rand = "0.10.2"
+strum = { version = "0.28.0", features = ["derive"] }
 text-input = "0.1.2"

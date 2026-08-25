@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
 use crate::{
-    cardinal_direction::CardinalDirection,
     door_config::DoorConfig,
-    input::{InputChoice, InputMessage, get_input},
+    enemy::{Enemy, EnemyType},
+    input_wrappers::{Direction, get_direction},
     player::Player,
     room::Room,
     room_location::RoomLocation,
@@ -83,34 +83,41 @@ impl Dungeon {
                 None => RoomDoorGenerationStatus::NotGenerated,
             });
 
-        Room::new(DoorConfig {
-            north: room_to_north,
-            east: room_to_east,
-            south: room_to_south,
-            west: room_to_west,
-        })
+        Room::new(
+            DoorConfig {
+                north: room_to_north,
+                east: room_to_east,
+                south: room_to_south,
+                west: room_to_west,
+            },
+            if rand::random_bool(1. / 4.0) {
+                Some(Enemy::new(EnemyType::Bat, 128.0))
+            } else {
+                None
+            },
+        )
     }
 
-    fn go_direction(&mut self, direction: CardinalDirection) {
+    fn go_direction(&mut self, direction: Direction) {
         self.player.location = self.player.location.copy_with_diff(
             match direction {
-                CardinalDirection::North => 0,
-                CardinalDirection::East => 1,
-                CardinalDirection::South => 0,
-                CardinalDirection::West => -1,
+                Direction::North => 0,
+                Direction::East => 1,
+                Direction::South => 0,
+                Direction::West => -1,
             },
             match direction {
-                CardinalDirection::North => 1,
-                CardinalDirection::East => 0,
-                CardinalDirection::South => -1,
-                CardinalDirection::West => 0,
+                Direction::North => 1,
+                Direction::East => 0,
+                Direction::South => -1,
+                Direction::West => 0,
             },
         );
 
         println!("{}", self.get_room(&self.player.location.clone()).display())
     }
 
-    pub fn get_room(&mut self, location: &RoomLocation) -> &Room {
+    pub fn get_room(&mut self, location: &RoomLocation) -> &mut Room {
         let generated_room = self.generate_new_room(location);
         self.map.entry(location.clone()).or_insert(generated_room)
     }
@@ -119,64 +126,52 @@ impl Dungeon {
         let location = self.player.location.clone();
         let room = self.get_room(&location);
 
-        let inputs = [
-            InputChoice {
-                name: "go north".to_string(),
-                key: 'n',
-                message: InputMessage::North,
-                show: room.door_config.north,
-            },
-            InputChoice {
-                name: "go east".to_string(),
-                key: 'e',
-                message: InputMessage::East,
-                show: room.door_config.east,
-            },
-            InputChoice {
-                name: "go south".to_string(),
-                key: 's',
-                message: InputMessage::South,
-                show: room.door_config.south,
-            },
-            InputChoice {
-                name: "go west".to_string(),
-                key: 'w',
-                message: InputMessage::West,
-                show: room.door_config.west,
-            },
-        ];
-
-        let input = get_input(&inputs);
-
-        match input.message {
-            InputMessage::North => {
+        let direction = get_direction(&room.door_config);
+        match direction {
+            Direction::North => {
                 if room.door_config.north {
-                    self.go_direction(CardinalDirection::North);
+                    self.go_direction(direction);
                 } else {
-                    println!("Can't go north.")
+                    println!("Can't go north.");
                 }
             }
-            InputMessage::East => {
+            Direction::East => {
                 if room.door_config.east {
-                    self.go_direction(CardinalDirection::East);
+                    self.go_direction(direction);
                 } else {
-                    println!("Can't go east.")
+                    println!("Can't go east.");
                 }
             }
-            InputMessage::South => {
+            Direction::South => {
                 if room.door_config.south {
-                    self.go_direction(CardinalDirection::South);
+                    self.go_direction(direction);
                 } else {
-                    println!("Can't go south.")
+                    println!("Can't go south.");
                 }
             }
-            InputMessage::West => {
+            Direction::West => {
                 if room.door_config.west {
-                    self.go_direction(CardinalDirection::West);
+                    self.go_direction(direction);
                 } else {
-                    println!("Can't go west.")
+                    println!("Can't go west.");
                 }
             }
         }
+
+        let mut new_player = self.player.clone();
+
+        let location = self.player.location.clone();
+        let current_room = self.get_room(&location);
+
+        current_room.cycle(&mut new_player);
+
+        self.player = new_player;
+    }
+
+    pub fn display_room(&mut self) {
+        let location = self.player.location.clone();
+        let room = self.get_room(&location);
+
+        println!("{}", room.display());
     }
 }
