@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+dyn-clone = "1.0.20"
 rand = "0.10.2"
 strum = { version = "0.28.0", features = ["derive"] }
 text-input = "0.1.2"

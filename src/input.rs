@@ -1,11 +1,13 @@
 use text_input::text;
 
+#[derive(Clone, Copy)]
 pub enum InputMessage {
     North,
     South,
     East,
     West,
     Punch,
+    Sword,
 }
 
 pub struct InputChoice {

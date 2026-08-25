@@ -1,6 +1,7 @@
 use crate::{
     door_config::DoorConfig,
     input::{InputChoice, InputMessage, get_input},
+    item::Weapon,
 };
 
 pub enum Direction {
@@ -8,10 +9,6 @@ pub enum Direction {
     East,
     South,
     West,
-}
-
-pub enum AttackInput {
-    Punch,
 }
 
 pub fn get_direction(door_config: &DoorConfig) -> Direction {
@@ -56,17 +53,21 @@ pub fn get_direction(door_config: &DoorConfig) -> Direction {
     }
 }
 
-pub fn get_attack_input() -> AttackInput {
-    let inputs = [InputChoice {
-        name: "punch with your fist (5 dmg)".to_string(),
-        key: 'p',
-        message: InputMessage::Punch,
-        show: true,
-    }];
+pub fn get_attack_input(weapons: Vec<Weapon>) -> Weapon {
+    let inputs: Vec<InputChoice> = weapons
+        .iter()
+        .map(|weapon| InputChoice {
+            name: format!("attack with {} ({} dmg)", weapon.name, weapon.damage),
+            message: weapon.message,
+            key: weapon.key,
+            show: true,
+        })
+        .collect();
 
     loop {
         let u_input = match get_input(&inputs).message {
-            InputMessage::Punch => Some(AttackInput::Punch),
+            InputMessage::Punch => Some(Weapon::new_fist()),
+            InputMessage::Sword => Some(Weapon::new_sword()),
             _ => None,
         };
 

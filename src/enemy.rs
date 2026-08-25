@@ -1,9 +1,10 @@
-use std::{process::exit, thread, time};
+use std::{cmp, process::exit, thread, time};
 
 use rand::random_bool;
 
 use crate::{
-    input_wrappers::{AttackInput, get_attack_input},
+    input_wrappers::get_attack_input,
+    item::Weapon,
     player::Player,
 };
 
@@ -71,7 +72,7 @@ impl Enemy {
             );
         }
 
-        println!("It has {} health.", self.health);
+        println!("It has {} health.", cmp::max(0, self.health));
     }
 
     fn do_damage_to_player(&self, player: &mut Player, damage: i32, miss_chance: f64) {
@@ -92,10 +93,21 @@ impl Enemy {
     fn attack_cycle(&mut self, player: &mut Player) {
         println!("The {} attacked you.", self.enemy_type);
         let player_success = loop {
-            let u_input = get_attack_input();
-            match u_input {
-                AttackInput::Punch => self.do_damage_to_enemy(5, 1.0 / 5.0),
-            }
+            let u_input = get_attack_input(
+                player
+                    .items
+                    .iter()
+                    .cloned()
+                    .filter_map(|item| {
+                        item.into_any()
+                            .downcast::<Weapon>()
+                            .ok()
+                            .map(|boxed_struct| *boxed_struct)
+                    })
+                    .collect(),
+            );
+
+            self.do_damage_to_enemy(u_input.damage, 1.0 / 5.0);
 
             if self.health <= 0 {
                 break true;
@@ -107,8 +119,9 @@ impl Enemy {
                 break false;
             }
         };
+
         if player_success {
-            println!("You killed the {}", self.enemy_type);
+            println!("You killed the {}.", self.enemy_type);
         } else {
             println!("The {} defeated you. Game over.", self.enemy_type);
             exit(0);

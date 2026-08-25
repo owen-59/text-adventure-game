@@ -158,6 +158,8 @@ impl Dungeon {
             }
         }
 
+        println!("{}", self.player.display_items());
+
         let mut new_player = self.player.clone();
 
         let location = self.player.location.clone();

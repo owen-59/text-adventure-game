@@ -4,6 +4,7 @@ mod dungeon;
 mod enemy;
 mod input;
 mod input_wrappers;
+mod item;
 mod player;
 mod room;
 mod room_location;
