@@ -8,6 +8,7 @@ pub enum InputMessage {
     West,
     Punch,
     Sword,
+    PickUp,
 }
 
 pub struct InputChoice {

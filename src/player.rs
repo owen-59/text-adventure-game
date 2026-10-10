@@ -1,5 +1,5 @@
 use crate::{
-    item::{InventoryItem, Weapon},
+    item::{Item, Weapon},
     room_location::RoomLocation,
 };
 
@@ -7,7 +7,7 @@ use crate::{
 pub struct Player {
     pub location: RoomLocation,
     pub health: i32,
-    pub items: Vec<Box<dyn InventoryItem>>,
+    pub items: Vec<Item>,
 }
 
 impl Player {
@@ -15,10 +15,7 @@ impl Player {
         Self {
             location: RoomLocation { x: 0, y: 0 },
             health: 120,
-            items: vec![
-                Box::new(Weapon::new_fist()),
-                Box::new(Weapon::new_sword()), // todo remove this
-            ],
+            items: vec![Box::new(Weapon::new_fist())],
         }
     }
 

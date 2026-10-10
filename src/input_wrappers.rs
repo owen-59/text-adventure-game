@@ -4,6 +4,11 @@ use crate::{
     item::Weapon,
 };
 
+pub enum Input {
+    Direction(Direction),
+    PickUp,
+}
+
 pub enum Direction {
     North,
     East,
@@ -11,7 +16,7 @@ pub enum Direction {
     West,
 }
 
-pub fn get_direction(door_config: &DoorConfig) -> Direction {
+pub fn get_main_input(door_config: &DoorConfig, is_items: bool) -> Input {
     let inputs = [
         InputChoice {
             name: "go north".to_string(),
@@ -37,14 +42,21 @@ pub fn get_direction(door_config: &DoorConfig) -> Direction {
             message: InputMessage::West,
             show: door_config.west,
         },
+        InputChoice {
+            name: "grab item".to_string(),
+            key: 'g',
+            message: InputMessage::PickUp,
+            show: is_items,
+        },
     ];
 
     loop {
         let u_input = match get_input(&inputs).message {
-            InputMessage::North => Some(Direction::North),
-            InputMessage::East => Some(Direction::East),
-            InputMessage::South => Some(Direction::South),
-            InputMessage::West => Some(Direction::West),
+            InputMessage::North => Some(Input::Direction(Direction::North)),
+            InputMessage::East => Some(Input::Direction(Direction::East)),
+            InputMessage::South => Some(Input::Direction(Direction::South)),
+            InputMessage::West => Some(Input::Direction(Direction::West)),
+            InputMessage::PickUp => Some(Input::PickUp),
             _ => None,
         };
         if let Some(direction) = u_input {

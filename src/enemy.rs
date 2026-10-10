@@ -2,11 +2,7 @@ use std::{cmp, process::exit, thread, time};
 
 use rand::random_bool;
 
-use crate::{
-    input_wrappers::get_attack_input,
-    item::Weapon,
-    player::Player,
-};
+use crate::{input_wrappers::get_attack_input, item::Weapon, player::Player};
 
 #[derive(Clone, strum::Display)]
 pub enum EnemyType {

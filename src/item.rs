@@ -1,8 +1,11 @@
 use std::any::Any;
 
 use dyn_clone::DynClone;
+use rand::seq::IndexedRandom;
 
 use crate::input::InputMessage;
+
+pub type Item = Box<dyn InventoryItem>;
 
 pub trait InventoryItem: DynClone + Any {
     fn display(&self) -> &'static str;
@@ -53,4 +56,9 @@ impl Weapon {
             key: 's',
         }
     }
+}
+
+pub fn get_rand_item() -> Option<Box<dyn InventoryItem>> {
+    let avail: Vec<Item> = vec![Box::new(Weapon::new_sword())];
+    avail.choose(&mut rand::rng()).cloned() as Option<Box<dyn InventoryItem>>
 }

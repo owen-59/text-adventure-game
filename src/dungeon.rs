@@ -3,7 +3,8 @@ use std::collections::HashMap;
 use crate::{
     door_config::DoorConfig,
     enemy::{Enemy, EnemyType},
-    input_wrappers::{Direction, get_direction},
+    input_wrappers::{Direction, Input, get_main_input},
+    item::get_rand_item,
     player::Player,
     room::Room,
     room_location::RoomLocation,
@@ -83,6 +84,22 @@ impl Dungeon {
                 None => RoomDoorGenerationStatus::NotGenerated,
             });
 
+        let enemy = if rand::random_bool(1.0 / 4.0) {
+            Some(Enemy::new(EnemyType::Bat, 128.0))
+        } else {
+            None
+        };
+
+        let items = if rand::random_bool(1.0 / 5.0) {
+            if let Some(item) = get_rand_item() {
+                vec![item]
+            } else {
+                vec![]
+            }
+        } else {
+            vec![]
+        };
+
         Room::new(
             DoorConfig {
                 north: room_to_north,
@@ -90,11 +107,8 @@ impl Dungeon {
                 south: room_to_south,
                 west: room_to_west,
             },
-            if rand::random_bool(1. / 4.0) {
-                Some(Enemy::new(EnemyType::Bat, 128.0))
-            } else {
-                None
-            },
+            enemy,
+            items,
         )
     }
 
@@ -126,34 +140,43 @@ impl Dungeon {
         let location = self.player.location.clone();
         let room = self.get_room(&location);
 
-        let direction = get_direction(&room.door_config);
+        let direction = get_main_input(&room.door_config, !room.items.is_empty());
         match direction {
-            Direction::North => {
+            Input::Direction(Direction::North) => {
                 if room.door_config.north {
-                    self.go_direction(direction);
+                    self.go_direction(Direction::North);
                 } else {
                     println!("Can't go north.");
                 }
             }
-            Direction::East => {
+            Input::Direction(Direction::East) => {
                 if room.door_config.east {
-                    self.go_direction(direction);
+                    self.go_direction(Direction::East);
                 } else {
                     println!("Can't go east.");
                 }
             }
-            Direction::South => {
+            Input::Direction(Direction::South) => {
                 if room.door_config.south {
-                    self.go_direction(direction);
+                    self.go_direction(Direction::South);
                 } else {
                     println!("Can't go south.");
                 }
             }
-            Direction::West => {
+            Input::Direction(Direction::West) => {
                 if room.door_config.west {
-                    self.go_direction(direction);
+                    self.go_direction(Direction::West);
                 } else {
                     println!("Can't go west.");
+                }
+            }
+            Input::PickUp => {
+                if !room.items.is_empty() {
+                    let item = room.items.swap_remove(0);
+                    println!("You picked up {}.", item.display());
+                    self.player.items.push(item);
+                } else {
+                    println!("There is nothing to pick up.");
                 }
             }
         }
