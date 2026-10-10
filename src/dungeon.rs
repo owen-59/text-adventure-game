@@ -84,18 +84,16 @@ impl Dungeon {
                 None => RoomDoorGenerationStatus::NotGenerated,
             });
 
-        let enemy = if rand::random_bool(1.0 / 4.0) {
+        let enemy = if rand::random_bool(1.0 / 2.0) {
             Some(Enemy::new(EnemyType::Bat, 128.0))
         } else {
             None
         };
 
-        let items = if rand::random_bool(1.0 / 5.0) {
-            if let Some(item) = get_rand_item() {
-                vec![item]
-            } else {
-                vec![]
-            }
+        let items = if rand::random_bool(1.0 / 3.0)
+            && let Some(item) = get_rand_item()
+        {
+            vec![item]
         } else {
             vec![]
         };
